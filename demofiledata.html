@@ -1,0 +1,371 @@
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Report Dashboard</title>
+            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+            <style>
+                
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f6f9;
+        }
+        .header {
+            padding: 20px;
+            text-align: center;
+            color: rgb(0, 0, 0);
+        }
+        .header img {
+            height: 80px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 32px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        .section {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            height: 400px;
+        }
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .chart-container {
+            position: relative;
+            height: 100%;
+        }
+        .section-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+        .row {
+            grid-column: span 2;
+        }
+        .charts-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+            </style>
+        </head>
+        <body>
+        
+        <div class="header">
+            <img src="logo.svg" alt="Logo"> <!-- Replace with your actual logo -->
+            <h1>Daily Report Dashboard</h1>
+        </div>
+        
+        <div class="container">
+            <!-- Field Selection Report -->
+            <div class="section">
+                <h3>Field Selection Report</h3>
+                <div class="chart-container">
+                    <canvas id="fieldSelectionChart"></canvas>
+                </div>
+                <div class="section-footer">Field Selection Data</div>
+            </div>
+        
+            <!-- Daily Rates Report -->
+            <div class="section">
+                <h3>Daily Rates Report</h3>
+                <div class="chart-container">
+                    <canvas id="dailyRatesChart"></canvas>
+                </div>
+                <div class="section-footer">Daily Rates Data</div>
+            </div>
+        
+            <!-- Harvesting Report -->
+            <div class="section">
+                <h3>Harvesting Report</h3>
+                <div class="chart-container">
+                    <canvas id="harvestingChart"></canvas>
+                </div>
+                <div class="section-footer">Harvesting Data</div>
+            </div>
+        
+            <!-- Rejections Report -->
+            <div class="section">
+                <h3>Rejections Report</h3>
+                <div class="chart-container">
+                    <canvas id="rejectionsChart"></canvas>
+                </div>
+                <div class="section-footer">Rejection Data</div>
+            </div>
+        
+            <!-- Local Transport Report -->
+            <div class="section">
+                <h3>Local Transport Report</h3>
+                <div class="chart-container">
+                    <canvas id="localTransportChart"></canvas>
+                </div>
+                <div class="section-footer">Transport Data</div>
+            </div>
+        
+            <!-- Cold Storage Report -->
+            <div class="section">
+                <h3>Cold Storage Report</h3>
+                <div class="chart-container">
+                    <canvas id="coldStorageChart"></canvas>
+                </div>
+                <div class="section-footer">Cold Storage Data</div>
+            </div>
+        
+            <!-- Front End Report -->
+            <div class="section">
+                <h3>Front End Report</h3>
+                <div class="chart-container">
+                    <canvas id="frontEndChart"></canvas>
+                </div>
+                <div class="section-footer">Front End Data</div>
+            </div>
+        </div>
+        
+        <script>
+            // Function to simulate reading the Excel file and process data from a file path (for now, use ArrayBuffer)
+            function readExcelFileFromPath(filePath) {
+                // This is a mock-up function. In a real-world scenario, you would use something like AJAX or fetch to get the file.
+                fetch(filePath)
+                    .then(response => response.arrayBuffer())
+                    .then(data => processExcelData(data));
+            }
+        
+            // Function to process the Excel data
+            function processExcelData(data) {
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(sheet);
+        
+                // Process and render charts for each report section
+                processFieldSelectionData(jsonData);
+                processDailyRatesData(jsonData);
+                processHarvestingData(jsonData);
+                processRejectionsData(jsonData);
+                processLocalTransportData(jsonData);
+                processColdStorageData(jsonData);
+                processFrontEndData(jsonData);
+            }
+        
+            // Function for Field Selection Report
+            function processFieldSelectionData(data) {
+                const fieldSelectionData = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Volume',
+                        data: [],
+                        backgroundColor: '#4CAF50',
+                        borderColor: '#388E3C',
+                        borderWidth: 1
+                    }]
+                };
+        
+                data.forEach(row => {
+                    if (row['0'] && row['4'] && row['14']) {
+                        fieldSelectionData.labels.push(row['0']);
+                        fieldSelectionData.datasets[0].data.push(row['6']); // Sum of column index 6
+                    }
+                });
+        
+                new Chart(document.getElementById('fieldSelectionChart'), {
+                    type: 'bar',
+                    data: fieldSelectionData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Function for Daily Rates Report
+            function processDailyRatesData(data) {
+                const dailyRatesData = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily Rates',
+                        data: [],
+                        backgroundColor: '#FF9800',
+                        borderColor: '#F57C00',
+                        borderWidth: 1
+                    }]
+                };
+        
+                data.forEach(row => {
+                    if (row['25']) {
+                        dailyRatesData.labels.push(row['25']);
+                        dailyRatesData.datasets[0].data.push(row['22']); // Sum of column index 22
+                    }
+                });
+        
+                new Chart(document.getElementById('dailyRatesChart'), {
+                    type: 'bar',
+                    data: dailyRatesData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Function for Harvesting Report (Pie Chart)
+            function processHarvestingData(data) {
+                const harvestingData = {
+                    labels: ['Category 1', 'Category 2', 'Category 3'], // Categories you want in pie chart
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#FF5733', '#33FF57', '#3357FF'],
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                };
+        
+                let category1 = 0, category2 = 0, category3 = 0;
+        
+                data.forEach(row => {
+                    if (row['27'] && row['28']) {
+                        const sum = row['30'] + row['31']; // Sum of column 30 and 31
+                        category1 += row['32']; // Sum of column 32
+                        category2 += row['33']; // Sum of column 33
+                        category3 += row['34']; // Sum of column 34
+                    }
+                });
+        
+                harvestingData.datasets[0].data = [category1, category2, category3];
+        
+                new Chart(document.getElementById('harvestingChart'), {
+                    type: 'pie',
+                    data: harvestingData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Function for Rejection Report
+            function processRejectionsData(data) {
+                const rejectionData = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Rejections',
+                        data: [],
+                        backgroundColor: '#F44336',
+                        borderColor: '#D32F2F',
+                        borderWidth: 1
+                    }]
+                };
+        
+                data.forEach(row => {
+                    if (row['46'] && row['48']) {
+                        rejectionData.labels.push(row['46']);
+                        rejectionData.datasets[0].data.push(row['49']); // Sum of column index 49
+                    }
+                });
+        
+                new Chart(document.getElementById('rejectionsChart'), {
+                    type: 'bar',
+                    data: rejectionData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Function for Local Transport Report
+            function processLocalTransportData(data) {
+                const localTransportData = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Transport Volume',
+                        data: [],
+                        backgroundColor: '#2196F3',
+                        borderColor: '#1976D2',
+                        borderWidth: 1
+                    }]
+                };
+        
+                data.forEach(row => {
+                    if (row['54'] && row['57']) {
+                        localTransportData.labels.push(row['54']);
+                        localTransportData.datasets[0].data.push(row['58']); // Sum of column index 58
+                    }
+                });
+        
+                new Chart(document.getElementById('localTransportChart'), {
+                    type: 'bar',
+                    data: localTransportData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Function for Cold Storage Report
+            function processColdStorageData(data) {
+                const coldStorageData = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Cold Storage Volume',
+                        data: [],
+                        backgroundColor: '#00BCD4',
+                        borderColor: '#008C9E',
+                        borderWidth: 1
+                    }]
+                };
+        
+                data.forEach(row => {
+                    if (row['63'] && row['64']) {
+                        coldStorageData.labels.push(row['63']);
+                        coldStorageData.datasets[0].data.push(row['76']); // Sum of column index 76
+                    }
+                });
+        
+                new Chart(document.getElementById('coldStorageChart'), {
+                    type: 'bar',
+                    data: coldStorageData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Function for Front End Report
+            function processFrontEndData(data) {
+                const frontEndData = {
+                    labels: [],
+                    datasets: [{
+                        label: 'Front End Volume',
+                        data: [],
+                        backgroundColor: '#9C27B0',
+                        borderColor: '#7B1FA2',
+                        borderWidth: 1
+                    }]
+                };
+        
+                data.forEach(row => {
+                    if (row['79'] && row['99']) {
+                        frontEndData.labels.push(row['79']);
+                        frontEndData.datasets[0].data.push(row['93'] + row['94']); // Sum of column index 93 & 94 from 95
+                    }
+                });
+        
+                new Chart(document.getElementById('frontEndChart'), {
+                    type: 'bar',
+                    data: frontEndData,
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        
+            // Call to load the file
+            readExcelFileFromPath('demodata.xlsx'); // Replace with the actual file path
+        </script>
+        
+        </body>
+        </html>
+        

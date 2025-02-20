@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rudrastar Impex | FrontEnd Process</title>
+
+  <!-- Google Font: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* General Body Style */
+    body {
+      font-family: 'Poppins', 'Poppins','Poppins','Poppins';
+      text-align: center;
+      padding: 10px;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-weight: 600;
+      color: #4b77be;
+      font-size: 1.7em;
+      margin-bottom: 10px;
+    }
+
+    #myChart {
+      margin-top: 20px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      width: 100%;
+      height: 400px; /* Default height */
+    }
+
+    .avg-value {
+      margin-top: 20px;
+      font-size: 1.4em;
+      font-weight: 600;
+      color: #2ecc71;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .chart-container {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .submit-btn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      width: 100%;
+      max-width: 250px;
+    }
+
+    .submit-btn:hover {
+      background-color: #2980b9;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.4em;
+      }
+
+      .submit-btn {
+        padding: 10px 20px;
+      }
+
+      .avg-value {
+        font-size: 1em;
+      }
+
+      /* Mobile-specific chart adjustments */
+      #myChart {
+        height: 350px; /* Adjust the height for mobile */
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.2em;
+      }
+
+      .submit-btn {
+        font-size: 1em;
+        max-width: 200px;
+      }
+
+      .avg-value {
+        font-size: 0.5em;
+      }
+
+      /* Smaller hover text for mobile */
+      .chartjs-tooltip {
+        font-size: 12px !important; /* Smaller hover text */
+      }
+
+      /* Mobile-specific chart adjustments */
+      #myChart {
+        height: 320px; /* Adjust further for smaller devices */
+      }
+    }
+
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Rudrastar Impex | FrontEnd Process</h1>
+
+    <!-- Submit Button -->
+    <button class="submit-btn" id="submit-btn">Generate Graph</button>
+
+    <!-- Canvas to display chart -->
+    <div class="chart-container">
+      <canvas id="myChart" width="600" height="400"></canvas>
+      <div class="avg-value" id="avg-value">
+        Overall Average: N/A
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Path to the Excel file (use your local file path here)
+    const filePath = 'datafile/frontend.xlsx'; // Modify this to your file path
+    let excelData = []; // Store the data
+    let filteredData = [];
+
+    window.onload = function() {
+      fetchExcelData(filePath);
+    };
+
+    function fetchExcelData(filePath) {
+      // Load the Excel file (adjust for local paths as required)
+      fetch(filePath)
+        .then(response => response.arrayBuffer())
+        .then(data => {
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]]; // Assuming data is in the first sheet
+
+          // Convert sheet to JSON format
+          excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        })
+        .catch(error => console.error('Error loading file:', error));
+    }
+
+    document.getElementById('submit-btn').addEventListener('click', generateGraph);
+
+    function generateGraph() {
+      // Filter the data for columns 4 and 5 (assuming the data for the bar chart is in columns 4 and 5)
+      filteredData = excelData.slice(1); // Ignore the first row (header)
+
+      const uniqueValues = {};
+      let totalSum = 0;
+      let totalCount = 0;
+
+      filteredData.forEach(row => {
+        const col4Value = row[4]; // Column 4 (X-axis values)
+        const col5Value = row[5]; // Column 5 (Y-axis values)
+
+        if (!uniqueValues[col4Value]) {
+          uniqueValues[col4Value] = { sum: 0, count: 0 };
+        }
+
+        uniqueValues[col4Value].sum += col5Value;
+        uniqueValues[col4Value].count++;
+
+        totalSum += col5Value;
+        totalCount++;
+      });
+
+      // Prepare data for the bar chart (average of column 5 for each unique value in column 4)
+      const labels = Object.keys(uniqueValues);
+      const dataValues = labels.map(label => uniqueValues[label].sum / uniqueValues[label].count);
+
+      // Calculate averages for all filtered data
+      const avg = totalCount > 0 ? totalSum / totalCount : 0;
+      document.getElementById('avg-value').textContent = `Overall Average: ${avg.toFixed(2)}`;
+
+      // Create the chart
+      createBarChart(labels, dataValues);
+    }
+
+    function createBarChart(labels, dataValues) {
+      const ctx = document.getElementById('myChart').getContext('2d');
+
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Average of Transporters Charges',
+            data: dataValues,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  family: 'Poppins', // Set font to Poppins
+                }
+              }
+            }
+          },
+          onClick: function(event, elements) {
+            if (elements.length > 0) {
+              const elementIndex = elements[0].index;
+              const label = labels[elementIndex];
+
+              // Filter data based on the clicked bar (unique value of column 4)
+              const filtered = filteredData.filter(row => row[4] === label);
+              const avg = filtered.reduce((acc, row) => acc + row[5], 0) / filtered.length;
+
+              // Display the average for the clicked bar
+              document.getElementById('avg-value').textContent = `Average for ${label}: ${avg.toFixed(2)}`;
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,165 @@
+<html>
+<head>
+    <title>People's Issues Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="font-poppins bg-gray-100">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 p-4 text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold">PIMS</a>
+            <ul class="flex space-x-4">
+                <li><a href="#submit-issue" class="hover:underline">Submit Issue</a></li>
+                <li><a href="#manage-issues" class="hover:underline">Manage Issues</a></li>
+                <li><a href="#admin-panel" class="hover:underline">Admin Panel</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Submit Issue Section -->
+    <section id="submit-issue" class="container mx-auto p-6 bg-white mt-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Submit an Issue</h2>
+        <form class="space-y-4">
+            <div>
+                <label for="issue-title" class="block text-sm font-medium text-gray-700">Issue Title</label>
+                <input type="text" id="issue-title" class="mt-1 block w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div>
+                <label for="issue-description" class="block text-sm font-medium text-gray-700">Issue Description</label>
+                <textarea id="issue-description" class="mt-1 block w-full p-2 border border-gray-300 rounded"></textarea>
+            </div>
+            <div>
+                <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+                <select id="department" class="mt-1 block w-full p-2 border border-gray-300 rounded">
+                    <option>Health</option>
+                    <option>Education</option>
+                    <option>Infrastructure</option>
+                    <option>Environment</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+        </form>
+    </section>
+
+    <!-- Manage Issues Section -->
+    <section id="manage-issues" class="container mx-auto p-6 bg-white mt-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Manage Issues</h2>
+        <div class="space-y-4">
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Issue Title 1</h3>
+                <p class="text-gray-700">Description of the issue goes here.</p>
+                <p class="text-gray-500">Department: Health</p>
+                <div class="mt-2">
+                    <label for="status-1" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select id="status-1" class="mt-1 block w-full p-2 border border-gray-300 rounded">
+                        <option>Pending</option>
+                        <option>In Progress</option>
+                        <option>Resolved</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Issue Title 2</h3>
+                <p class="text-gray-700">Description of the issue goes here.</p>
+                <p class="text-gray-500">Department: Education</p>
+                <div class="mt-2">
+                    <label for="status-2" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select id="status-2" class="mt-1 block w-full p-2 border border-gray-300 rounded">
+                        <option>Pending</option>
+                        <option>In Progress</option>
+                        <option>Resolved</option>
+                    </select>
+                </div>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Issue Title 3</h3>
+                <p class="text-gray-700">Description of the issue goes here.</p>
+                <p class="text-gray-500">Department: Infrastructure</p>
+                <div class="mt-2">
+                    <label for="status-3" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select id="status-3" class="mt-1 block w-full p-2 border border-gray-300 rounded">
+                        <option>Pending</option>
+                        <option>In Progress</option>
+                        <option>Resolved</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Panel Section -->
+    <section id="admin-panel" class="container mx-auto p-6 bg-white mt-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Admin Panel</h2>
+        <div class="space-y-4">
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Manage Users</h3>
+                <p class="text-gray-700">Add, remove, or update user roles and permissions.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Manage Users</button>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">System Settings</h3>
+                <p class="text-gray-700">Configure system-wide settings and preferences.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">System Settings</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard for Assembly Executive -->
+    <section id="assembly-executive-dashboard" class="container mx-auto p-6 bg-white mt-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Assembly Executive Dashboard</h2>
+        <div class="space-y-4">
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Submit New Issue</h3>
+                <p class="text-gray-700">Submit new issues to be addressed by the respective departments.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Submit Issue</button>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">View Submitted Issues</h3>
+                <p class="text-gray-700">View and track the status of issues you have submitted.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">View Issues</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard for Department Manager -->
+    <section id="department-manager-dashboard" class="container mx-auto p-6 bg-white mt-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Department Manager Dashboard</h2>
+        <div class="space-y-4">
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Manage Department Issues</h3>
+                <p class="text-gray-700">View and update the status of issues assigned to your department.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Manage Issues</button>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">Department Reports</h3>
+                <p class="text-gray-700">Generate and view reports on the issues handled by your department.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">View Reports</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard for Admin -->
+    <section id="admin-dashboard" class="container mx-auto p-6 bg-white mt-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Admin Dashboard</h2>
+        <div class="space-y-4">
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">User Management</h3>
+                <p class="text-gray-700">Add, remove, or update user roles and permissions.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">Manage Users</button>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">System Settings</h3>
+                <p class="text-gray-700">Configure system-wide settings and preferences.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">System Settings</button>
+            </div>
+            <div class="p-4 border border-gray-300 rounded">
+                <h3 class="text-xl font-bold">View All Issues</h3>
+                <p class="text-gray-700">View and manage all issues submitted in the system.</p>
+                <button class="bg-blue-600 text-white px-4 py-2 rounded mt-2">View Issues</button>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

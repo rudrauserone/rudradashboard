@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rudrastar Impex | Rejection</title>
+
+  <!-- Google Font: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* General Body Style */
+    body {
+      font-family: 'Poppins', 'Poppins','Poppins','Poppins';
+      text-align: center;
+      padding: 10px;
+      background-color: #f7f7f7;
+      color: #333;
+      margin: 0;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-weight: 600;
+      color: #4b77be;
+      font-size: 1.7em;
+      margin-bottom: 10px;
+    }
+
+    #myChart {
+      margin-top: 20px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      width: 100%;
+      height: 400px; /* Default height */
+    }
+
+    .avg-value {
+      margin-top: 20px;
+      font-size: 1.4em;
+      font-weight: 600;
+      color: #2ecc71;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .chart-container {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .submit-btn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2em;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      width: 100%;
+      max-width: 250px;
+    }
+
+    .submit-btn:hover {
+      background-color: #2980b9;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 1.4em;
+      }
+
+      .submit-btn {
+        padding: 10px 20px;
+      }
+
+      .avg-value {
+        font-size: 1em;
+      }
+
+      /* Mobile-specific chart adjustments */
+      #myChart {
+        height: 350px; /* Adjust the height for mobile */
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.2em;
+      }
+
+      .submit-btn {
+        font-size: 1em;
+        max-width: 200px;
+      }
+
+      .avg-value {
+        font-size: 0.5em;
+      }
+
+      /* Smaller hover text for mobile */
+      .chartjs-tooltip {
+        font-size: 12px !important; /* Smaller hover text */
+      }
+
+      /* Mobile-specific chart adjustments */
+      #myChart {
+        height: 320px; /* Adjust further for smaller devices */
+      }
+    }
+
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Rudrastar Impex | Rejection</h1>
+
+    <!-- Submit Button -->
+    <button class="submit-btn" id="submit-btn">Generate Graph</button>
+
+    <!-- Canvas to display chart -->
+    <div class="chart-container">
+      <canvas id="myChart" width="600" height="400"></canvas>
+      <div class="avg-value" id="avg-value">
+        Overall Sum: N/A
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Path to the Excel file (use your local file path here)
+    const filePath = 'datafile/rejection.xlsx'; // Modify this to your file path
+    let excelData = []; // Store the data
+    let filteredData = [];
+
+    window.onload = function() {
+      fetchExcelData(filePath);
+    };
+
+    function fetchExcelData(filePath) {
+      // Load the Excel file (adjust for local paths as required)
+      fetch(filePath)
+        .then(response => response.arrayBuffer())
+        .then(data => {
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]]; // Assuming data is in the first sheet
+
+          // Convert sheet to JSON format
+          excelData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        })
+        .catch(error => console.error('Error loading file:', error));
+    }
+
+    document.getElementById('submit-btn').addEventListener('click', generateGraph);
+
+    function generateGraph() {
+      // Filter the data for columns 1 (values to sum) and 2 (unique values for X-axis)
+      filteredData = excelData.slice(1); // Ignore the first row (header)
+
+      const uniqueValues = {};
+      let totalSum = 0;
+
+      filteredData.forEach(row => {
+        const col2Value = row[2]; // Column 2 (unique values for X-axis)
+        const col1Value = row[1]; // Column 1 (values to sum)
+
+        // Initialize an entry for each unique value in column 2
+        if (!uniqueValues[col2Value]) {
+          uniqueValues[col2Value] = 0;
+        }
+
+        // Accumulate the sum of column 1 for each unique value of column 2
+        uniqueValues[col2Value] += col1Value;
+
+        // Calculate total sum for the overall sum
+        totalSum += col1Value;
+      });
+
+      // Prepare data for the bar chart (sum of column 1 for each unique value in column 2)
+      const labels = Object.keys(uniqueValues);
+      const dataValues = labels.map(label => uniqueValues[label]);
+
+      // Display the overall sum
+      document.getElementById('avg-value').textContent = `Overall Sum: ${totalSum.toFixed(2)}`;
+
+      // Create the chart with the prepared data
+      createBarChart(labels, dataValues);
+    }
+
+    function createBarChart(labels, dataValues) {
+      const ctx = document.getElementById('myChart').getContext('2d');
+
+      const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Sum of Column 1 Values',
+            data: dataValues,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  family: 'Poppins', // Set font to Poppins
+                }
+              }
+            }
+          },
+          onClick: function(event, elements) {
+            if (elements.length > 0) {
+              const elementIndex = elements[0].index;
+              const label = labels[elementIndex];
+
+              // Display the sum for the clicked bar
+              document.getElementById('avg-value').textContent = `Sum for ${label}: ${dataValues[elementIndex].toFixed(2)}`;
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+  </script>
+
+</body>
+</html>
